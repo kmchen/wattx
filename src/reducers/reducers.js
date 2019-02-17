@@ -4,7 +4,17 @@ import { data } from '../../data/data';
 
 const initialState = {
 	histories: [],
-	data: data.tours
+	data: data.data.reduce((acc, curr) => {
+    const { price, volume_24h, percent_change_24h, market_cap }  = curr.quote.USD;
+    acc.push({
+      name: curr.name,
+      price,
+      volume: volume_24h,
+      priceChange: percent_change_24h,
+      marketCap: market_cap
+    })
+    return acc; 
+  }, [])
 };
 
 export function reducers(state, action) {
