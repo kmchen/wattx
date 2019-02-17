@@ -1,26 +1,21 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import { connect } from 'react-redux'
 
 import { Nav } from "./components/Nav";
 import { Table } from "./components/Table";
+import BaseComponent from "./BaseComponent";
 
 export class MarketOverviewComponent extends Component {
   constructor() {
     super();
-    this.state = {
-      results: [],
-    };
   }
 
   render() {
+    let data = this.props.topList ?  this.props.data.slice(0, this.props.topList) : this.props.data;
     return (
-      <>
-        <section className="hero is-fullheight is-default is-bold">
-          <Nav />
-          <Table data={this.props.data}/>
-        </section>
-      </>
+      <BaseComponent>
+        <Table data={data}/>
+      </BaseComponent>
     );
   }
 }
@@ -28,20 +23,12 @@ export class MarketOverviewComponent extends Component {
 const mapStateToProps = state => {
   return {
     data: state.data,
+    topList: state.topList
   }
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    pushSearchResults: results => {
-      dispatch({type: PUSH_SEARCH_RESULT, payload: results})
-    }
-  }
-}
-
 const MarketOverview = connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToProps
 )(MarketOverviewComponent);
 
 export default MarketOverview;

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import { connect } from 'react-redux'
 
 import { Nav } from "./components/Nav";
 import { Chart } from "./components/Chart";
+import BaseComponent from "./BaseComponent";
 
 export class LiquidityComponent extends Component {
   constructor() {
@@ -11,16 +11,19 @@ export class LiquidityComponent extends Component {
   }
 
   render() {
-    let data = this.props.data.map(val => (
-      {x: val.marketCap.toFixed(2), y: val.volume.toFixed(2), z: val.priceChange.toFixed(2)}
-    ))
+    let data = this.props.topList ?  this.props.data.slice(0, this.props.topList) : this.props.data;
+    let assetInfo = data.map(val => (
+      {
+        name: val.name,
+        x: val.marketCap.toFixed(2),
+        y: val.volume.toFixed(2),
+        z: val.priceChange.toFixed(2)
+      }
+    ));
     return (
-      <>
-        <section className="hero is-fullheight is-default is-bold">
-          <Nav />
-          <Chart data={data}/>
-        </section>
-      </>
+      <BaseComponent>
+        <Chart data={assetInfo}/>
+      </BaseComponent>
     );
   }
 }
@@ -28,6 +31,7 @@ export class LiquidityComponent extends Component {
 const mapStateToProps = state => {
   return {
     data: state.data,
+    topList: state.topList
   }
 };
 

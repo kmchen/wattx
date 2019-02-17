@@ -1,1 +1,1 @@
-export const PUSH_SEARCH_RESULT = 'PUSH_SEARCH_RESULT';
+export const TOP_LIST = 'TOP_LIST';

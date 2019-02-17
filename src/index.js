@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { reducers } from './reducers/reducers';
 
 import Liquidity from './Liquidity';
@@ -14,17 +14,17 @@ require('../asset/main.scss');
 const store = createStore(reducers, composeWithDevTools());
 
 const Root = ({ store }) => (
-    <Provider store={store}>
-      <Router>
-        <div>
-          <Route exact path="/" component={Liquidity}/>
-          <Route exact path="/liquidity" component={MarketOverview}/>
-        </div>
-      </Router>
-    </Provider>
+	<Provider store={store}>
+		<Router>
+			<div>
+				<Route exact path="/" component={Liquidity}/>
+				<Route exact path="/liquidity" component={MarketOverview}/>
+			</div>
+		</Router>
+	</Provider>
 );
 
 ReactDOM.render(
-  <Root store={store} />,
-	document.getElementById('create-article-form')
+	<Root store={store} />,
+	document.getElementById('app')
 );

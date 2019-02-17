@@ -18,7 +18,7 @@ const TableRows = ({data}) => {
   data.forEach((val, key) => {
     rows.push(
       <tr key={val.name}>
-        <td>{key+1}</td>
+        <td>{val.rank}</td>
         <td>{val.name}</td>
         <td>{val.price.toFixed(2)}</td>
         <td>{val.priceChange.toFixed(2)}</td>
