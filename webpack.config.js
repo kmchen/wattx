@@ -2,6 +2,9 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
+  devServer: {
+    historyApiFallback: true,
+  },
   module: {
     rules: [
       {
