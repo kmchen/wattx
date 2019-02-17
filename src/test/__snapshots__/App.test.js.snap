@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App component should render App component 1`] = `
+<Fragment>
+  <Nav />
+  <SearchBar
+    histories={Array []}
+    onChange={[Function]}
+    onDelete={[Function]}
+    onKeyPress={[Function]}
+    onSetResults={[Function]}
+    searchText=""
+  />
+  <Sort
+    priceSortName="Price"
+    ratingSortName="Rating"
+    sortByPrice={[Function]}
+    sortByRating={[Function]}
+  />
+  <Results
+    results={
+      Array [
+        Object {
+          "currency": "$",
+          "isSpecialOffer": true,
+          "price": "41",
+          "rating": "4.5",
+          "title": "Berlin: 2.5-Hour Boat Tour Along the River Spree",
+        },
+        Object {
+          "currency": "$",
+          "isSpecialOffer": true,
+          "price": "50",
+          "rating": "4.6",
+          "title": "Reichstag: Rooftop Coffee Break at Käfer",
+        },
+        Object {
+          "currency": "$",
+          "isSpecialOffer": true,
+          "price": "46",
+          "rating": "4.9",
+          "title": "Skip the Line: Neues Museum Berlin Tickets",
+        },
+      ]
+    }
+  />
+</Fragment>
+`;

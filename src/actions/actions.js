@@ -1,0 +1,1 @@
+export const PUSH_SEARCH_RESULT = 'PUSH_SEARCH_RESULT';
