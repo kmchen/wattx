@@ -33,7 +33,7 @@ const TableRows = ({data}) => {
 
 export const Table = ({data}) =>
   <TableContainer>
-    <table className="table is-bordered pricing__table is-fullwidth">
+    <table className="table is-bordered is-fullwidth">
       <TableHeader />
       <TableRows data={data} />
     </table>

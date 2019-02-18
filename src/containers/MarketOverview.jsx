@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Table } from "../components/Table";
 import BaseContainer from "./BaseContainer";
 
-export class MarketOverviewComponent extends Component {
+export class MarketOverviewContainer extends Component {
   constructor() {
     super();
   }
@@ -13,7 +13,7 @@ export class MarketOverviewComponent extends Component {
     let data = this.props.topList ?  this.props.data.slice(0, this.props.topList) : this.props.data;
     return (
       <BaseContainer>
-        <Table data={data}/>
+        <Table data={this.props.data}/>
       </BaseContainer>
     );
   }
@@ -28,6 +28,6 @@ const mapStateToProps = state => {
 
 const MarketOverview = connect(
   mapStateToProps
-)(MarketOverviewComponent);
+)(MarketOverviewContainer);
 
 export default MarketOverview;

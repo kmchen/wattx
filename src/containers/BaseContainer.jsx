@@ -6,13 +6,18 @@ import { Nav } from "../components/Nav";
 export class BaseContainerWrapper extends Component {
   constructor() {
     super();
+    this.state = { topList: 0 };
+  }
+
+  selectTopList = (number) => {
+    this.setState({topList: number});
   }
 
   render() {
     return (
       <>
-        <Nav />
-        { this.props.children}
+        <Nav selectTopList={this.selectTopList}/>
+        { this.props.children }
       </>
     );
   }

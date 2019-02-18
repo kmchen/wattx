@@ -5,7 +5,7 @@ import { Nav } from "../components/Nav";
 import { Chart } from "../components/Chart";
 import BaseContainer from "./BaseContainer";
 
-export class LiquidityComponent extends Component {
+export class LiquidityContainer extends Component {
   constructor() {
     super();
   }
@@ -37,6 +37,6 @@ const mapStateToProps = state => {
 
 const Liquidity = connect(
   mapStateToProps
-)(LiquidityComponent);
+)(LiquidityContainer);
 
 export default Liquidity;
