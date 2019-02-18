@@ -4,6 +4,13 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
   devServer: {
     historyApiFallback: true,
+    proxy: {
+      '/data': {
+        target: 'http://localhost:8082',
+        secure: false,
+        changeOrigin: true
+      }
+    }
   },
   module: {
     rules: [

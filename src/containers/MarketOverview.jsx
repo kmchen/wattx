@@ -13,7 +13,7 @@ export class MarketOverviewContainer extends Component {
     let data = this.props.topList ?  this.props.data.slice(0, this.props.topList) : this.props.data;
     return (
       <BaseContainer>
-        <Table data={this.props.data}/>
+        <Table data={data}/>
       </BaseContainer>
     );
   }

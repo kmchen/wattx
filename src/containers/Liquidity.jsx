@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux'
 
+import BaseContainer from "./BaseContainer";
 import { Nav } from "../components/Nav";
 import { Chart } from "../components/Chart";
-import BaseContainer from "./BaseContainer";
 
 export class LiquidityContainer extends Component {
   constructor() {

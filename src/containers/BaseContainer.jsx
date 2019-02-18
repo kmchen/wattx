@@ -2,36 +2,44 @@ import React, { Component } from "react";
 import { connect } from 'react-redux'
 
 import { Nav } from "../components/Nav";
+import { TOP_LIST } from "../actions/actions";
 
 export class BaseContainerWrapper extends Component {
   constructor() {
     super();
-    this.state = { topList: 0 };
   }
 
-  selectTopList = (number) => {
-    this.setState({topList: number});
+  selectTopList = number => {
+    this.props.selectTopList(number);
   }
 
   render() {
     return (
-      <>
-        <Nav selectTopList={this.selectTopList}/>
+      <section className="hero is-fullheight is-default is-bold">
+        <Nav selectTopList={this.selectTopList} />
         { this.props.children }
-      </>
+      </section>
     );
   }
 }
 
 const mapStateToProps = state => {
   return {
-    data: state.data,
     topList: state.topList
   }
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    selectTopList: number => {
+      dispatch({type: TOP_LIST, payload: number})
+    }
+  }
+}
+
 const BaseContainer = connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(BaseContainerWrapper);
 
 export default BaseContainer;
