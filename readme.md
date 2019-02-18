@@ -1,17 +1,25 @@
+# How to run
+  - cd wattx/server && npm install && npm start
+  - cd wattx && npm install && npm start (http://localhost:8081)
 
-    A comprehensive description of how to run your solution. Assume that a person who will check your code has to install all the required dependencies and toolkits. Even better, use Docker and docker-compose to package your solution.
     A description of the problem and solution.
-    The reasoning behind your technical choices: trade-offs you might have made, anything you left out, or what you might do differently if you had additional time.
-    What you'd do next and why.
+
+# Problem
+  - Doesn't handle huge amount of data. A potential solution is pagination. 
+  - Type safe. Typescript is an alternative.
 
 # Technology choice
-  - Javascript GUI framework: React, redux
-  - Test: Jest, Enzyme
-  - Build tool: Webpack
+  - React eco system: Reactjs, redux, thunk over saga
+  - Test: Jest for snapshot testing, Enzyme allows to travel and dom manipulation
+  - Web framework: express, Hapi is another alternative 
+  - Bundler tool: Webpack, a much simpler bundler tool than gulp
   - Styling: bulma, bulma template, scss, style component
 
-# Features
-
-  - Search history 
-  - Results can be sorted by price and rating
-  - Display special offers from the start.
+# What's next
+  - Dockerization
+  - Server side rendering for better user experience
+  - More unit test
+  - Code spliting
+  - Replace dev-server with server framework such as express or hapi
+  - Scatter plot zoom in/out 
+  - Responseiveness has rooms for improvement
