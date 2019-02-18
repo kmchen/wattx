@@ -21,9 +21,9 @@ export class LiquidityComponent extends Component {
       }
     ));
     return (
-      <BaseComponent>
+      <BaseContainer>
         <Chart data={assetInfo}/>
-      </BaseComponent>
+      </BaseContainer>
     );
   }
 }
