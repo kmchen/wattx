@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 const TableHeader = () =>
   <thead>
@@ -31,10 +32,16 @@ const TableRows = ({data}) => {
 }
 
 export const Table = ({data}) =>
-  <table className="table">
-    <TableHeader />
-    <TableRows data={data} />
-  </table>
+  <TableContainer>
+    <table className="table is-bordered pricing__table is-fullwidth">
+      <TableHeader />
+      <TableRows data={data} />
+    </table>
+  </TableContainer>
+
+const TableContainer = styled.div`
+  overflow-x: auto;
+`;
 
 Table.propTypes = {
   data: PropTypes.array.isRequired,
