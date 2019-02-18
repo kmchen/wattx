@@ -6,8 +6,8 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { reducers } from './reducers/reducers';
 
-import Liquidity from './Liquidity';
-import MarketOverview from './MarketOverview';
+import Liquidity from './containers/Liquidity';
+import MarketOverview from './containers/MarketOverview';
 
 require('../asset/main.scss');
 

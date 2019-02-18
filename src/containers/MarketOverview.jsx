@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux'
 
-import { Nav } from "./components/Nav";
-import { Table } from "./components/Table";
-import BaseComponent from "./BaseComponent";
+import { Table } from "../components/Table";
+import BaseContainer from "./BaseContainer";
 
 export class MarketOverviewComponent extends Component {
   constructor() {
