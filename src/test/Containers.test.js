@@ -25,12 +25,12 @@ describe('App component', () => {
 			marketCap: market_cap
 		});
 		return acc; 
-	}, []).sort((a, b) => a.rank - b.rank)
+	}, []).sort((a, b) => a.rank - b.rank);
 
 	beforeEach(() => {
 		const props = {
 	    data: parsedData,
-      topList: 0
+			topList: 0
 		};
 		MarketOverview = shallow(<MarketOverviewContainer {...props} />);
 		Liquidity = shallow(<LiquidityContainer {...props} />);
@@ -40,7 +40,7 @@ describe('App component', () => {
 		expect(MarketOverview).toMatchSnapshot();
 	});
   
-  it('should render Liquidity component', () => {
-    expect(Liquidity).toMatchSnapshot();
-  });
+	it('should render Liquidity component', () => {
+		expect(Liquidity).toMatchSnapshot();
+	});
 });
