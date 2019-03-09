@@ -9,7 +9,7 @@ const styles = {
 };
 
 export const InputField = ({data, title, onChange}) => {
-  const onChanges = (event) => {
+  const onInputChange = (event) => {
     onChange({value: event.target.value, errMsg: data.errMsg});
   } 
   return (
@@ -19,7 +19,7 @@ export const InputField = ({data, title, onChange}) => {
         <span style={styles.errMsg} >{data.errMsg}</span>
       </label>
       <div className="control">
-        <input className="input" type="text" onChange={onChanges} />
+        <input className="input" type="text" onChange={onInputChange} />
       </div>
     </div>
   )

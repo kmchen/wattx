@@ -5,12 +5,13 @@ const styles = {
     color: 'red',
     fontSize: '12px',
     marginLeft: '10px'
+  },
+  wrapper : {
+    marginBottom: '0.75rem'
   }
 };
 
 export const Dropdown = ({onChange, data, options, title, defaultValue}) => {
-  const [isActive, setIsActive] = useState(false);
-  const showOptions = isActive ? 'is-active' : '';
   const keys = Object.keys(options);
   let dropdownList = [
     <option disabled={true} key={'default'}>{defaultValue}</option>
@@ -19,10 +20,10 @@ export const Dropdown = ({onChange, data, options, title, defaultValue}) => {
     dropdownList.push(<option key={key}>{key}</option>)
   });
   const onSelect = (event) => {
-    onChange({value: event.target.value, errMsg: data.errMsg});
+    onChange({value: event.target.value, errMsg: ''});
   } 
   return (
-    <div style={{marginBottom: '0.75rem'}}>
+    <div style={styles.wrapper}>
       <label className="label">
         <span>{title}</span>
         <span style={styles.errMsg} >{data.errMsg}</span>

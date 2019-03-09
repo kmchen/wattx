@@ -9,15 +9,17 @@ const styles = {
   }
 };
 
-export const BirthDayicker = ({data, title, onChange}) => {
+export const BirthDayPicker = ({data, title, onChange}) => {
+  const [selectedDate, setselectedDate] = useState(null);
   const onSelect = (selectedDate) => {
     const date = new Date(selectedDate);
+    setselectedDate(date);
     const year = date.getFullYear();
     const month = ("0" + (date.getMonth() + 1)).slice(-2);
     const day = ("0" + date.getDate()).slice(-2);
     onChange({
       value: `${year}${month}${day}`,
-      errMsg: data.errMsg
+      errMsg: ''
     });
   }; 
   return (
@@ -31,6 +33,7 @@ export const BirthDayicker = ({data, title, onChange}) => {
         showYearDropdown={true}
         showMonthDropdown={true}
         maxDate={new Date()}
+        selected={selectedDate}
         onChange={onSelect}
       />
     </div>
