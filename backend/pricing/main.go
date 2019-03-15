@@ -34,8 +34,10 @@ type Price struct {
 
 const topAssetsUrl = "https://min-api.cryptocompare.com/data/top/volumes?tsym=USD&limit=500"
 const currencyUrl = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s"
+
 const topAssetCachingTime = 120 * time.Second
 const converstionRateLimit = 60 * time.Second
+const batchSize = 10
 
 func isWhiteListed(asset string) bool {
 	for _, v := range whiteList {
@@ -46,42 +48,74 @@ func isWhiteListed(asset string) bool {
 	return false
 }
 
+const DefaultClient = &http.Client{}
+
+func httpGet(url string, headers map[string]string) ([]byte, error) {
+	//resp, err := http.Get(url)
+	//if err != nil {
+	//return nil, err
+	//}
+	//defer resp.Body.Close()
+	//body, err := ioutil.ReadAll(resp.Body)
+	//if err != nil {
+	//return nil, err
+	//}
+	//return body, err
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("Fail to create request, %v\n", err)
+		return nil, err
+	}
+	// Add header
+	if header != nil {
+		for k, v := range headers {
+			req.Header.Add(k, v)
+		}
+	}
+	resp, err := DefaultClient.Do(req)
+	if err != nil {
+		fmt.Printf("Fail to send request %v\n", err)
+		return nil, err
+	}
+
+}
+
 func getTopAssets(topAssetsChan chan []string) {
 	ticker := time.NewTicker(topAssetCachingTime)
-	for {
-		select {
-		case t := <-ticker.C:
-			fmt.Printf("Fetching top 200 assets %v", t)
-			resp, err := httpGet(topAssetsUrl)
-			if err != nil {
-				fmt.Printf("Fail to fetch top asset: %v", err)
-			}
-			crypto := Crypto{}
-			if err := json.Unmarshal(resp, &crypto); err != nil {
-				fmt.Printf("Fail to unmarshal assets: %v", err)
-			}
-
-			sort.Slice(crypto.Data,
-				func(i, j int) bool {
-					return crypto.Data[j].Volume24hourto < crypto.Data[i].Volume24hourto
-				},
-			)
-			var topAssets = make([]string, 200)
-			for k, _ := range topAssets {
-				if isWhiteListed(crypto.Data[k].Symbol) {
-					topAssets[k] = crypto.Data[k].Symbol
-				}
-			}
-			fmt.Printf("Top assets size: %v", len(topAssets))
-			topAssetsChan <- topAssets
+	for t := range ticker.C {
+		// Fetching top 500
+		fmt.Printf("Fetching top 200 assets %v\n", t)
+		resp, err := httpGet(topAssetsUrl)
+		if err != nil {
+			fmt.Printf("Fail to fetch top asset: %v\n", err)
 		}
+		crypto := Crypto{}
+		if err := json.Unmarshal(resp, &crypto); err != nil {
+			fmt.Printf("Fail to unmarshal assets: %v\n", err)
+		}
+
+		sort.Slice(crypto.Data,
+			func(i, j int) bool {
+				return crypto.Data[j].Volume24hourto < crypto.Data[i].Volume24hourto
+			},
+		)
+		var topAssets = make([]string, 200)
+		var j = 0
+		for i := 0; i < len(crypto.Data) && j < len(topAssets); i += 1 {
+			if isWhiteListed(crypto.Data[i].Symbol) {
+				topAssets[j] = crypto.Data[i].Symbol
+				j += 1
+			}
+		}
+		fmt.Printf("Top assets size: %v\n", topAssets)
+		topAssetsChan <- topAssets
 	}
 }
 
-func getAssetValue(topAssetsChan chan []string) {
+func getAssetValue(topAssetsChan chan []string, assetValueDoneChan chan bool) {
 	ticker := time.NewTicker(converstionRateLimit)
 	done := make(chan Conversion, 10)
-	batchSize := 9
 	for {
 		select {
 		case result := <-done:
@@ -91,24 +125,25 @@ func getAssetValue(topAssetsChan chan []string) {
 			for i := 0; i < len(topAssets); i += batchSize {
 				assets := topAssets[i : i+batchSize]
 				assetsStr := strings.Join(assets, ",")
+				fmt.Printf("url: %s\n", assetsStr, batchSize)
 				go func(symbols string, done chan Conversion) {
 					var url = fmt.Sprintf(currencyUrl, symbols)
 					var DefaultClient = &http.Client{}
 					req, err := http.NewRequest("GET", url, nil)
 					if err != nil {
-						fmt.Printf("Fail to create currency request, %v", err)
+						fmt.Printf("Fail to create currency request, %v\n", err)
 						return
 					}
 					req.Header.Add("X-CMC_PRO_API_KEY", "101f8864-41d9-4223-9f32-effa9b886491")
 					resp, err := DefaultClient.Do(req)
 					if err != nil {
-						fmt.Printf("Fail to get Currency %v", err)
+						fmt.Printf("Fail to get Currency %v\n", err)
 						return
 					}
 					defer resp.Body.Close()
 					body, err := ioutil.ReadAll(resp.Body)
 					if err != nil {
-						fmt.Printf("Fail to read response %v", err)
+						fmt.Printf("Fail to read response %v\n", err)
 					}
 					conversion := Conversion{}
 					err = json.Unmarshal(body, &conversion)
@@ -124,81 +159,12 @@ func getAssetValue(topAssetsChan chan []string) {
 }
 
 func main() {
-
-	//for _, v := range crypto.Data {
-	//go func(symbol string, done chan Conversion) {
-	//const currencyUrl = "http://localhost:8082?symbol=%s"
-	//var url = fmt.Sprintf(currencyUrl, symbol)
-	//var DefaultClient = &http.Client{}
-	//req, _ := http.NewRequest("GET", url, nil)
-	//resp2, _ := DefaultClient.Do(req)
-	//defer resp2.Body.Close()
-	//body, _ := ioutil.ReadAll(resp2.Body)
-	//if err != nil {
-	//fmt.Println("error: ioutil")
-	//}
-	//conversion := Conversion{}
-	//err := json.Unmarshal(body, &conversion)
-	//if err != nil {
-	//fmt.Println("error:", err)
-	//}
-	//fmt.Printf("%s, %+v\n", symbol, conversion)
-	//done <- conversion
-	//}(v.Symbol, done)
-	//}
+	topAssetsChan := make(chan []string)
+	assetValueDoneChan := make(chan bool)
+	go getAssetValue(topAssetsChan, assetValueDoneChan)
+	go getTopAssets(topAssetsChan)
+	<-assetValueDoneChan
 }
-
-func httpGet(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return body, err
-}
-
-//var acc = 0
-//ticker := time.NewTicker(60 * time.Second)
-//done := make(chan Conversion, 10)
-//for {
-//select {
-//case <-done:
-//fmt.Printf("%v: %+v\n", acc)
-//acc = acc + 1
-//if acc == 210 {
-//ticker.Stop()
-//return
-//}
-//case <-ticker.C:
-//for _, v := range crypto.Data[acc : acc+9] {
-//go func(symbol string, done chan Conversion) {
-//const currencyUrl = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s"
-//var url = fmt.Sprintf(currencyUrl, symbol)
-//var DefaultClient = &http.Client{}
-//req, _ := http.NewRequest("GET", url, nil)
-//req.Header.Add("X-CMC_PRO_API_KEY", "101f8864-41d9-4223-9f32-effa9b886491")
-//resp2, _ := DefaultClient.Do(req)
-//defer resp2.Body.Close()
-//body, _ := ioutil.ReadAll(resp2.Body)
-//if err != nil {
-//fmt.Println("error: ioutil")
-//}
-//conversion := Conversion{}
-//err := json.Unmarshal(body, &conversion)
-//if err != nil {
-//fmt.Println("error:", err)
-//}
-//fmt.Printf("%s, %+v\n", symbol, conversion)
-//done <- conversion
-//}(v.Symbol, done)
-//}
-//}
-//fmt.Printf("%v sent", acc)
-//}
 
 var whiteList = []string{
 	"LTC",
