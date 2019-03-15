@@ -48,7 +48,7 @@ func isWhiteListed(asset string) bool {
 	return false
 }
 
-const DefaultClient = &http.Client{}
+var DefaultClient = &http.Client{}
 
 func httpGet(url string, headers map[string]string) ([]byte, error) {
 	//resp, err := http.Get(url)
@@ -68,7 +68,7 @@ func httpGet(url string, headers map[string]string) ([]byte, error) {
 		return nil, err
 	}
 	// Add header
-	if header != nil {
+	if headers != nil {
 		for k, v := range headers {
 			req.Header.Add(k, v)
 		}
@@ -78,7 +78,13 @@ func httpGet(url string, headers map[string]string) ([]byte, error) {
 		fmt.Printf("Fail to send request %v\n", err)
 		return nil, err
 	}
-
+	defer resp.Body.Close()
+	// Read response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, err
 }
 
 func getTopAssets(topAssetsChan chan []string) {
@@ -86,7 +92,7 @@ func getTopAssets(topAssetsChan chan []string) {
 	for t := range ticker.C {
 		// Fetching top 500
 		fmt.Printf("Fetching top 200 assets %v\n", t)
-		resp, err := httpGet(topAssetsUrl)
+		resp, err := httpGet(topAssetsUrl, nil)
 		if err != nil {
 			fmt.Printf("Fail to fetch top asset: %v\n", err)
 		}
@@ -128,23 +134,27 @@ func getAssetValue(topAssetsChan chan []string, assetValueDoneChan chan bool) {
 				fmt.Printf("url: %s\n", assetsStr, batchSize)
 				go func(symbols string, done chan Conversion) {
 					var url = fmt.Sprintf(currencyUrl, symbols)
-					var DefaultClient = &http.Client{}
-					req, err := http.NewRequest("GET", url, nil)
-					if err != nil {
-						fmt.Printf("Fail to create currency request, %v\n", err)
-						return
+					var headers = map[string]string{
+						"X-CMC_PRO_API_KEY": "101f8864-41d9-4223-9f32-effa9b886491",
 					}
-					req.Header.Add("X-CMC_PRO_API_KEY", "101f8864-41d9-4223-9f32-effa9b886491")
-					resp, err := DefaultClient.Do(req)
-					if err != nil {
-						fmt.Printf("Fail to get Currency %v\n", err)
-						return
-					}
-					defer resp.Body.Close()
-					body, err := ioutil.ReadAll(resp.Body)
-					if err != nil {
-						fmt.Printf("Fail to read response %v\n", err)
-					}
+					var resp = httpGet(url, headers)
+					//var DefaultClient = &http.Client{}
+					//req, err := http.NewRequest("GET", url, nil)
+					//if err != nil {
+					//fmt.Printf("Fail to create currency request, %v\n", err)
+					//return
+					//}
+					//req.Header.Add()
+					//resp, err := DefaultClient.Do(req)
+					//if err != nil {
+					//fmt.Printf("Fail to get Currency %v\n", err)
+					//return
+					//}
+					//defer resp.Body.Close()
+					//body, err := ioutil.ReadAll(resp.Body)
+					//if err != nil {
+					//fmt.Printf("Fail to read response %v\n", err)
+					//}
 					conversion := Conversion{}
 					err = json.Unmarshal(body, &conversion)
 					if err != nil {
