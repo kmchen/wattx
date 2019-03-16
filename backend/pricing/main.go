@@ -15,45 +15,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Data struct {
-	Symbol         string  `json:"symbol"`
-	Volume24hourto float32 `json:"Volume24hourto"`
-}
+const (
+	address      = "localhost:50051"
+	topAssetsUrl = "https://min-api.cryptocompare.com/data/top/volumes?tsym=USD&limit=500"
+	currencyUrl  = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s"
 
-type Crypto struct {
-	Data []Data
-}
-
-type Conversion struct {
-	Data map[string]Currency
-}
-
-type Currency struct {
-	Quote  map[string]Price `json: "quote"`
-	Symbol string           `json: "symbol"`
-}
-
-type Price struct {
-	Price float32 `json: "price"`
-}
-
-const topAssetsUrl = "https://min-api.cryptocompare.com/data/top/volumes?tsym=USD&limit=500"
-const currencyUrl = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s"
+	assetUpdateTime = 60 * time.Second
+	batchSize       = 20
+)
 
 var headers = map[string]string{
 	"X-CMC_PRO_API_KEY": "101f8864-41d9-4223-9f32-effa9b886491",
-}
-
-const assetUpdateTime = 60 * time.Second
-const batchSize = 10
-
-func isWhiteListed(asset string) bool {
-	for _, v := range whiteList {
-		if v == asset {
-			return true
-		}
-	}
-	return false
 }
 
 var DefaultClient = &http.Client{}
@@ -134,10 +106,8 @@ func getAssetValue(topAssetsChan chan []string, assetDoneChan chan Conversion) {
 					fmt.Println("error:", err)
 					return
 				}
-				conversion := Conversion{}
-				err = json.Unmarshal(resp, &conversion)
+				conversion, err := UnmarshalConversion(resp)
 				if err != nil {
-					fmt.Println("error:", err)
 					return
 				}
 				done <- conversion
@@ -145,11 +115,6 @@ func getAssetValue(topAssetsChan chan []string, assetDoneChan chan Conversion) {
 		}
 	}
 }
-
-const (
-	address     = "localhost:50051"
-	defaultName = "world"
-)
 
 func main() {
 	topAssetsChan := make(chan []string)
@@ -163,289 +128,15 @@ func main() {
 	}
 	defer conn.Close()
 	c := pb.NewGreeterClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 
 	for value := range assetValueDoneChan {
-		fmt.Printf("%v\n", value)
-		pbPrice := pb.Price{
-			Price: float32(1.1),
-		}
-		pbQuote := map[string]*pb.Price{
-			"USD": &pbPrice,
-		}
-		pbCurrency := pb.Currency{
-			Quote:  pbQuote,
-			Symbol: "hello",
-		}
-		pbData := map[string]*pb.Currency{
-			"hello": &pbCurrency,
-		}
-		pbConversion := pb.Conversion{
-			Data: pbData,
-		}
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		pbConversion := toProtoConversion(value)
 		r, err := c.UpdateAsset(ctx, &pbConversion)
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
 		}
 		log.Printf("Greeting: %s", r.Status)
+		cancel()
 	}
-}
-
-var whiteList = []string{
-	"LTC",
-	"XRP",
-	"EOS",
-	"BCH",
-	"ETH",
-	"BTC",
-	"TX",
-	"EL",
-	"HB",
-	"XBTC21",
-	"CLOAK",
-	"LINDA",
-	"YOYOW",
-	"SPANK",
-	"SNGLS",
-	"WAVES",
-	"TRUMP",
-	"USNBT",
-	"WOMEN",
-	"XSPEC",
-	"STORJ",
-	"VOISE",
-	"UCASH",
-	"THETA",
-	"UNIFY",
-	"VIDZ",
-	"TELL",
-	"TOKC",
-	"TIME",
-	"UNIT",
-	"VERI",
-	"VEC2",
-	"UTNP",
-	"UBTC",
-	"VOLT",
-	"VPRC",
-	"WINK",
-	"WISH",
-	"XCXT",
-	"XAUR",
-	"QBIC",
-	"DEEX",
-	"ZENI",
-	"XSTC",
-	"XPTX",
-	"ZEIT",
-	"ZIPT",
-	"NOAH",
-	"MSCN",
-	"BRIA",
-	"HTML",
-	"CMCT",
-	"PLBT",
-	"PIRL",
-	"BTCZ",
-	"EURS",
-	"USDC",
-	"TRST",
-	"TUBE",
-	"AION",
-	"DASC",
-	"BCPT",
-	"ELEC",
-	"NEXO",
-	"CTXC",
-	"QASH",
-	"CCRB",
-	"MANA",
-	"IOST",
-	"DATA",
-	"GUSD",
-	"ECTE",
-	"TUSD",
-	"MITH",
-	"DOGE",
-	"DGTX",
-	"USDT",
-	"DASH",
-	"QTUM",
-	"XLM",
-	"BTG",
-	"NEO",
-	"ETC",
-	"ZEC",
-	"XMR",
-	"ZRX",
-	"REP",
-	"B2G",
-	"BSV",
-	"DAI",
-	"ADA",
-	"OMG",
-	"TRX",
-	"ETP",
-	"BTW",
-	"MGO",
-	"EDO",
-	"ORS",
-	"BNB",
-	"XTZ",
-	"NIO",
-	"ADK",
-	"PZM",
-	"VEE",
-	"BCA",
-	"XEM",
-	"SAN",
-	"GNT",
-	"INT",
-	"LSK",
-	"FUN",
-	"VEX",
-	"VET",
-	"RIF",
-	"GAS",
-	"ODE",
-	"ENJ",
-	"WAX",
-	"PAX",
-	"GNO",
-	"EDG",
-	"BTT",
-	"CPC",
-	"BAT",
-	"AGI",
-	"MNX",
-	"MKR",
-	"BCI",
-	"RLC",
-	"TDS",
-	"EMC",
-	"CCL",
-	"KNC",
-	"DIG",
-	"AVT",
-	"DGX",
-	"XVG",
-	"AUC",
-	"RCN",
-	"BCD",
-	"ATB",
-	"INK",
-	"ELF",
-	"ZIL",
-	"LKK",
-	"LEO",
-	"AID",
-	"DXT",
-	"DIM",
-	"DTH",
-	"DGB",
-	"STQ",
-	"TNB",
-	"MNC",
-	"HBZ",
-	"VRS",
-	"SNT",
-	"TRF",
-	"YOC",
-	"AC3",
-	"CHX",
-	"HOT",
-	"NVC",
-	"PXG",
-	"MLN",
-	"ANT",
-	"CND",
-	"BFT",
-	"EKO",
-	"NEU",
-	"CNN",
-	"MCO",
-	"WIZ",
-	"IPL",
-	"GRS",
-	"KRB",
-	"CVC",
-	"DOR",
-	"NTK",
-	"UQC",
-	"PAY",
-	"SVD",
-	"OXY",
-	"NIM",
-	"REC",
-	"PUT",
-	"TKA",
-	"AMB",
-	"ZYD",
-	"NYC",
-	"XPD",
-	"SPF",
-	"HWC",
-	"ZNY",
-	"ZSC",
-	"ZRC",
-	"ZUR",
-	"ZPT",
-	"ZET",
-	"ZCN",
-	"ZAP",
-	"XZC",
-	"XUC",
-	"XRA",
-	"XQN",
-	"XPY",
-	"XPC",
-	"XOT",
-	"XMO",
-	"XMG",
-	"XJO",
-	"XIN",
-	"XHI",
-	"XFC",
-	"XDN",
-	"XCO",
-	"XBY",
-	"XCT",
-	"XBP",
-	"WRC",
-	"WPR",
-	"WTC",
-	"WIN",
-	"WGR",
-	"WIC",
-	"WGO",
-	"WCT",
-	"WCO",
-	"WBB",
-	"VTA",
-	"VSX",
-	"VTC",
-	"VLT",
-	"VIB",
-	"VIT",
-	"VIA",
-	"UTT",
-	"UTK",
-	"USC",
-	"UNO",
-	"UNI",
-	"UIS",
-	"UFR",
-	"UKG",
-	"TTC",
-	"TSC",
-	"TRC",
-	"TOA",
-	"TNT",
-	"TKN",
-	"TIT",
-	"TIE",
-	"TFL",
-	"TEK",
-	"TCN",
 }
