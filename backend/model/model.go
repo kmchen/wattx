@@ -1,4 +1,4 @@
-package pricing
+package model
 
 import (
 	"encoding/json"
@@ -43,7 +43,7 @@ type AssetValue struct {
 	Value float32
 }
 
-func toProtoConversion(conversion Conversion) pb.Data {
+func ToProtoConversion(conversion Conversion) pb.Data {
 	var pbAssetValue = make([]*pb.AssetValue, 0)
 	for currencyName, currency := range conversion.Data {
 		for _, Price := range currency.Quote {

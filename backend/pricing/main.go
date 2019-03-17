@@ -1,8 +1,9 @@
-package pricing
+package main
 
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,12 +12,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wattx/backend/model"
 	pb "github.com/wattx/backend/proto"
 	"google.golang.org/grpc"
 )
 
 const (
-	address      = "localhost:50051"
 	topAssetsUrl = "https://min-api.cryptocompare.com/data/top/volumes?tsym=USD&limit=500"
 	currencyUrl  = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=%s"
 
@@ -24,6 +25,8 @@ const (
 	batchSize       = 20
 )
 
+var grpcServerIp = flag.String("serverIp", "localhost", "grpc server ip")
+var grpcPort = flag.String("port", "50051", "grpc server port")
 var headers = map[string]string{
 	"X-CMC_PRO_API_KEY": "101f8864-41d9-4223-9f32-effa9b886491",
 }
@@ -37,12 +40,14 @@ func httpGet(url string, headers map[string]string) ([]byte, error) {
 		fmt.Printf("Fail to create request, %v\n", err)
 		return nil, err
 	}
+
 	// Add header
 	if headers != nil {
 		for k, v := range headers {
 			req.Header.Add(k, v)
 		}
 	}
+
 	// Send out request
 	resp, err := DefaultClient.Do(req)
 	if err != nil {
@@ -50,6 +55,7 @@ func httpGet(url string, headers map[string]string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	// Read response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -69,7 +75,7 @@ func getTopAssets(topAssetsChan chan []string) {
 			fmt.Printf("Fail to fetch top asset: %v\n", err)
 		}
 		// Unmarshal Asset data
-		crypto := Crypto{}
+		crypto := model.Crypto{}
 		if err := json.Unmarshal(resp, &crypto); err != nil {
 			fmt.Printf("Fail to unmarshal assets: %v\n", err)
 		}
@@ -93,20 +99,20 @@ func getTopAssets(topAssetsChan chan []string) {
 	}
 }
 
-func getAssetValue(topAssetsChan chan []string, assetDoneChan chan Conversion) {
+func getAssetValue(topAssetsChan chan []string, assetDoneChan chan model.Conversion) {
 	for topAssets := range topAssetsChan {
 		for i := 0; i < len(topAssets); i += batchSize {
 			assets := topAssets[i : i+batchSize]
 			assetsStr := strings.Join(assets, ",")
 			fmt.Printf("url: %s\n", assetsStr, batchSize)
-			go func(symbols string, done chan Conversion) {
+			go func(symbols string, done chan model.Conversion) {
 				var url = fmt.Sprintf(currencyUrl, symbols)
 				var resp, err = httpGet(url, headers)
 				if err != nil {
 					fmt.Println("error:", err)
 					return
 				}
-				conversion, err := UnmarshalConversion(resp)
+				conversion, err := model.UnmarshalConversion(resp)
 				if err != nil {
 					return
 				}
@@ -117,13 +123,15 @@ func getAssetValue(topAssetsChan chan []string, assetDoneChan chan Conversion) {
 }
 
 func main() {
+	flag.Parse()
 	topAssetsChan := make(chan []string)
-	assetValueDoneChan := make(chan Conversion)
+	assetValueDoneChan := make(chan model.Conversion)
 	go getAssetValue(topAssetsChan, assetValueDoneChan)
 	go getTopAssets(topAssetsChan)
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	var grpcAddr = fmt.Sprintf("%s:%s", *grpcServerIp, *grpcPort)
+	conn, err := grpc.Dial(grpcAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -132,7 +140,7 @@ func main() {
 
 	for value := range assetValueDoneChan {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		pbData := toProtoConversion(value)
+		pbData := model.ToProtoConversion(value)
 		r, err := c.UpdateAsset(ctx, &pbData)
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)

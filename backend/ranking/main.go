@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sort"
 
-	pricing "github.com/wattx/backend/pricing"
+	"github.com/wattx/backend/model"
 	pb "github.com/wattx/backend/proto"
 	"google.golang.org/grpc"
 )
@@ -17,15 +17,14 @@ const (
 	port = ":50051"
 )
 
-// server is used to implement helloworld.GreeterServer.
 type server struct{}
 
-var ranking = map[string]pricing.AssetValue{}
+var ranking = map[string]model.AssetValue{}
 
 func (s *server) UpdateAsset(ctx context.Context, data *pb.Data) (*pb.Reply, error) {
 	log.Printf("Received: %v", data.Data)
 	for _, value := range data.Data {
-		ranking[value.Key] = pricing.AssetValue{
+		ranking[value.Key] = model.AssetValue{
 			Key:   value.Key,
 			Value: value.Value,
 		}
@@ -34,7 +33,7 @@ func (s *server) UpdateAsset(ctx context.Context, data *pb.Data) (*pb.Reply, err
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	assetValues := make([]pricing.AssetValue, len(ranking))
+	assetValues := make([]model.AssetValue, len(ranking))
 	for _, value := range ranking {
 		assetValues = append(assetValues, value)
 	}
