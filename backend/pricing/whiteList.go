@@ -1,4 +1,4 @@
-package main
+package pricing
 
 func isWhiteListed(asset string) bool {
 	for _, v := range whiteList {

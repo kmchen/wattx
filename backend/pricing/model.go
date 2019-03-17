@@ -1,4 +1,4 @@
-package main
+package pricing
 
 import (
 	"encoding/json"
@@ -38,24 +38,21 @@ func UnmarshalConversion(resp []byte) (Conversion, error) {
 	return conversion, err
 }
 
-func toProtoConversion(conversion Conversion) pb.Conversion {
-	var pbData = map[string]*pb.Currency{}
+type AssetValue struct {
+	Key   string
+	Value float32
+}
+
+func toProtoConversion(conversion Conversion) pb.Data {
+	var pbAssetValue = make([]*pb.AssetValue, 0)
 	for currencyName, currency := range conversion.Data {
-		pbQuote := map[string]*pb.Price{}
-		for priceName, Price := range currency.Quote {
-			pbPrice := pb.Price{
-				Price: Price.Price,
+		for _, Price := range currency.Quote {
+			assetValue := &pb.AssetValue{
+				Key:   currencyName,
+				Value: Price.Price,
 			}
-			pbQuote[priceName] = &pbPrice
+			pbAssetValue = append(pbAssetValue, assetValue)
 		}
-		pbCurrency := pb.Currency{
-			Symbol: currency.Symbol,
-			Quote:  pbQuote,
-		}
-		pbData[currencyName] = &pbCurrency
 	}
-	pbConversion := pb.Conversion{
-		Data: pbData,
-	}
-	return pbConversion
+	return pb.Data{Data: pbAssetValue}
 }

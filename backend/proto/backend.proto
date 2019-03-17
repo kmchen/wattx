@@ -1,52 +1,25 @@
-// Copyright 2015 gRPC authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 syntax = "proto3";
 
 option java_multiple_files = true;
-/*option java_package = "io.grpc.examples.helloworld";*/
-/*option java_outer_classname = "HelloWorldProto";*/
+
 option java_package = "io.grpc.wattx.backend";
 option java_outer_classname = "BackendProto";
 
 package backend;
 
-message Conversion {
-  map<string, Currency> Data = 1;
+message AssetValue {
+  string Key = 1;
+  float Value = 2;
 }
 
-message Currency {
-  map<string, Price> Quote = 1;
-  string Symbol = 2;
+message Data {
+  repeated AssetValue Data = 1;
 }
 
-message Price {
-  float Price = 1;
-}
-
-// The greeting service definition.
 service Greeter {
-  // Sends a greeting
-  rpc UpdateAsset (Conversion) returns (Reply) {}
+  rpc UpdateAsset (Data) returns (Reply) {}
 }
 
-// The request message containing the user's name.
-/*message HelloRequest {*/
-  /*[]Conversion data = 1;*/
-/*}*/
-
-/*// The response message containing the greetings*/
 message Reply {
   string status = 1;
 }

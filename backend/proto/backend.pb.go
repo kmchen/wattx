@@ -24,132 +24,92 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type Conversion struct {
-	Data                 map[string]*Currency `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+type AssetValue struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=Key,proto3" json:"Key,omitempty"`
+	Value                float32  `protobuf:"fixed32,2,opt,name=Value,proto3" json:"Value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Conversion) Reset()         { *m = Conversion{} }
-func (m *Conversion) String() string { return proto.CompactTextString(m) }
-func (*Conversion) ProtoMessage()    {}
-func (*Conversion) Descriptor() ([]byte, []int) {
+func (m *AssetValue) Reset()         { *m = AssetValue{} }
+func (m *AssetValue) String() string { return proto.CompactTextString(m) }
+func (*AssetValue) ProtoMessage()    {}
+func (*AssetValue) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{0}
 }
 
-func (m *Conversion) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Conversion.Unmarshal(m, b)
+func (m *AssetValue) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AssetValue.Unmarshal(m, b)
 }
-func (m *Conversion) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Conversion.Marshal(b, m, deterministic)
+func (m *AssetValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AssetValue.Marshal(b, m, deterministic)
 }
-func (m *Conversion) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Conversion.Merge(m, src)
+func (m *AssetValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AssetValue.Merge(m, src)
 }
-func (m *Conversion) XXX_Size() int {
-	return xxx_messageInfo_Conversion.Size(m)
+func (m *AssetValue) XXX_Size() int {
+	return xxx_messageInfo_AssetValue.Size(m)
 }
-func (m *Conversion) XXX_DiscardUnknown() {
-	xxx_messageInfo_Conversion.DiscardUnknown(m)
+func (m *AssetValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_AssetValue.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Conversion proto.InternalMessageInfo
+var xxx_messageInfo_AssetValue proto.InternalMessageInfo
 
-func (m *Conversion) GetData() map[string]*Currency {
+func (m *AssetValue) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *AssetValue) GetValue() float32 {
+	if m != nil {
+		return m.Value
+	}
+	return 0
+}
+
+type Data struct {
+	Data                 []*AssetValue `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *Data) Reset()         { *m = Data{} }
+func (m *Data) String() string { return proto.CompactTextString(m) }
+func (*Data) ProtoMessage()    {}
+func (*Data) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{1}
+}
+
+func (m *Data) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Data.Unmarshal(m, b)
+}
+func (m *Data) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Data.Marshal(b, m, deterministic)
+}
+func (m *Data) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Data.Merge(m, src)
+}
+func (m *Data) XXX_Size() int {
+	return xxx_messageInfo_Data.Size(m)
+}
+func (m *Data) XXX_DiscardUnknown() {
+	xxx_messageInfo_Data.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Data proto.InternalMessageInfo
+
+func (m *Data) GetData() []*AssetValue {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-type Currency struct {
-	Quote                map[string]*Price `protobuf:"bytes,1,rep,name=Quote,proto3" json:"Quote,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Symbol               string            `protobuf:"bytes,2,opt,name=Symbol,proto3" json:"Symbol,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
-}
-
-func (m *Currency) Reset()         { *m = Currency{} }
-func (m *Currency) String() string { return proto.CompactTextString(m) }
-func (*Currency) ProtoMessage()    {}
-func (*Currency) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{1}
-}
-
-func (m *Currency) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Currency.Unmarshal(m, b)
-}
-func (m *Currency) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Currency.Marshal(b, m, deterministic)
-}
-func (m *Currency) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Currency.Merge(m, src)
-}
-func (m *Currency) XXX_Size() int {
-	return xxx_messageInfo_Currency.Size(m)
-}
-func (m *Currency) XXX_DiscardUnknown() {
-	xxx_messageInfo_Currency.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Currency proto.InternalMessageInfo
-
-func (m *Currency) GetQuote() map[string]*Price {
-	if m != nil {
-		return m.Quote
-	}
-	return nil
-}
-
-func (m *Currency) GetSymbol() string {
-	if m != nil {
-		return m.Symbol
-	}
-	return ""
-}
-
-type Price struct {
-	Price                float32  `protobuf:"fixed32,1,opt,name=Price,proto3" json:"Price,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Price) Reset()         { *m = Price{} }
-func (m *Price) String() string { return proto.CompactTextString(m) }
-func (*Price) ProtoMessage()    {}
-func (*Price) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{2}
-}
-
-func (m *Price) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Price.Unmarshal(m, b)
-}
-func (m *Price) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Price.Marshal(b, m, deterministic)
-}
-func (m *Price) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Price.Merge(m, src)
-}
-func (m *Price) XXX_Size() int {
-	return xxx_messageInfo_Price.Size(m)
-}
-func (m *Price) XXX_DiscardUnknown() {
-	xxx_messageInfo_Price.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Price proto.InternalMessageInfo
-
-func (m *Price) GetPrice() float32 {
-	if m != nil {
-		return m.Price
-	}
-	return 0
-}
-
-//// The response message containing the greetings
 type Reply struct {
 	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -161,7 +121,7 @@ func (m *Reply) Reset()         { *m = Reply{} }
 func (m *Reply) String() string { return proto.CompactTextString(m) }
 func (*Reply) ProtoMessage()    {}
 func (*Reply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{3}
+	return fileDescriptor_5ab9ba5b8d8b2ba5, []int{2}
 }
 
 func (m *Reply) XXX_Unmarshal(b []byte) error {
@@ -190,38 +150,29 @@ func (m *Reply) GetStatus() string {
 }
 
 func init() {
-	proto.RegisterType((*Conversion)(nil), "backend.Conversion")
-	proto.RegisterMapType((map[string]*Currency)(nil), "backend.Conversion.DataEntry")
-	proto.RegisterType((*Currency)(nil), "backend.Currency")
-	proto.RegisterMapType((map[string]*Price)(nil), "backend.Currency.QuoteEntry")
-	proto.RegisterType((*Price)(nil), "backend.Price")
+	proto.RegisterType((*AssetValue)(nil), "backend.AssetValue")
+	proto.RegisterType((*Data)(nil), "backend.Data")
 	proto.RegisterType((*Reply)(nil), "backend.Reply")
 }
 
 func init() { proto.RegisterFile("backend.proto", fileDescriptor_5ab9ba5b8d8b2ba5) }
 
 var fileDescriptor_5ab9ba5b8d8b2ba5 = []byte{
-	// 312 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0xdf, 0x4a, 0xf3, 0x40,
-	0x10, 0xc5, 0xbf, 0x6d, 0xbf, 0xb4, 0x76, 0xaa, 0xa2, 0xeb, 0x1f, 0x4a, 0xb1, 0x58, 0x82, 0xd0,
-	0x5e, 0x2d, 0x18, 0xbd, 0x10, 0x6f, 0xc4, 0xaa, 0x28, 0x5e, 0xc5, 0x15, 0x1f, 0x60, 0x93, 0x0e,
-	0x12, 0x1a, 0xb3, 0x61, 0xb3, 0xa9, 0xe6, 0x19, 0x7c, 0x09, 0x1f, 0x55, 0xb2, 0xd9, 0x34, 0x8a,
-	0xbd, 0x9b, 0x33, 0x73, 0x76, 0xce, 0x8f, 0x1d, 0xd8, 0x0a, 0x44, 0xb8, 0xc0, 0x64, 0xce, 0x52,
-	0x25, 0xb5, 0xa4, 0x5d, 0x2b, 0xdd, 0x4f, 0x02, 0x70, 0x23, 0x93, 0x25, 0xaa, 0x2c, 0x92, 0x09,
-	0x3d, 0x85, 0xff, 0xb7, 0x42, 0x8b, 0x01, 0x19, 0xb7, 0xa7, 0x7d, 0x6f, 0xc4, 0xea, 0x57, 0x8d,
-	0x85, 0x95, 0xf3, 0xbb, 0x44, 0xab, 0x82, 0x1b, 0xeb, 0xf0, 0x11, 0x7a, 0xab, 0x16, 0xdd, 0x81,
-	0xf6, 0x02, 0x8b, 0x01, 0x19, 0x93, 0x69, 0x8f, 0x97, 0x25, 0x9d, 0x80, 0xb3, 0x14, 0x71, 0x8e,
-	0x83, 0xd6, 0x98, 0x4c, 0xfb, 0xde, 0x6e, 0xb3, 0x32, 0x57, 0x0a, 0x93, 0xb0, 0xe0, 0xd5, 0xfc,
-	0xb2, 0x75, 0x41, 0xdc, 0x2f, 0x02, 0x1b, 0x75, 0x9f, 0x7a, 0xe0, 0x3c, 0xe5, 0x52, 0xa3, 0x85,
-	0x39, 0xfa, 0xf3, 0x92, 0x99, 0x71, 0xc5, 0x52, 0x59, 0xe9, 0x21, 0x74, 0x9e, 0x8b, 0xb7, 0x40,
-	0xc6, 0x26, 0xae, 0xc7, 0xad, 0x1a, 0x3e, 0x00, 0x34, 0xe6, 0x35, 0x94, 0x27, 0xbf, 0x29, 0xb7,
-	0x57, 0x59, 0xbe, 0x8a, 0x42, 0xfc, 0x89, 0x38, 0x02, 0xc7, 0xf4, 0xe8, 0xbe, 0x2d, 0xcc, 0x9a,
-	0x16, 0xaf, 0x84, 0x7b, 0x0c, 0x0e, 0xc7, 0x34, 0x2e, 0x4a, 0x92, 0x4c, 0x0b, 0x9d, 0x67, 0x36,
-	0xc6, 0x2a, 0xef, 0x0a, 0xba, 0xf7, 0x0a, 0x51, 0xa3, 0xa2, 0xe7, 0xd0, 0x7f, 0x49, 0xe7, 0x42,
-	0xe3, 0x75, 0x96, 0xa1, 0xa6, 0x7b, 0x6b, 0x7e, 0x7b, 0xd8, 0x90, 0x98, 0xb5, 0xee, 0xbf, 0xd9,
-	0x04, 0x0e, 0x22, 0xc9, 0x5e, 0x55, 0x1a, 0xb2, 0x77, 0xa1, 0xf5, 0x47, 0x6d, 0x98, 0x6d, 0xce,
-	0xaa, 0xc2, 0x2f, 0x2f, 0xec, 0x93, 0xa0, 0x63, 0x4e, 0x7d, 0xf6, 0x1d, 0x00, 0x00, 0xff, 0xff,
-	0x22, 0x74, 0xe1, 0x05, 0xfb, 0x01, 0x00, 0x00,
+	// 209 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4d, 0x4a, 0x4c, 0xce,
+	0x4e, 0xcd, 0x4b, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x72, 0x95, 0x4c, 0xb8,
+	0xb8, 0x1c, 0x8b, 0x8b, 0x53, 0x4b, 0xc2, 0x12, 0x73, 0x4a, 0x53, 0x85, 0x04, 0xb8, 0x98, 0xbd,
+	0x53, 0x2b, 0x25, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83, 0x40, 0x4c, 0x21, 0x11, 0x2e, 0x56, 0xb0,
+	0x94, 0x04, 0x93, 0x02, 0xa3, 0x06, 0x53, 0x10, 0x84, 0xa3, 0xa4, 0xcf, 0xc5, 0xe2, 0x92, 0x58,
+	0x92, 0x28, 0xa4, 0x0e, 0xa1, 0x25, 0x18, 0x15, 0x98, 0x35, 0xb8, 0x8d, 0x84, 0xf5, 0x60, 0x96,
+	0x20, 0x8c, 0x0c, 0x02, 0x2b, 0x50, 0x92, 0xe7, 0x62, 0x0d, 0x4a, 0x2d, 0xc8, 0xa9, 0x14, 0x12,
+	0xe3, 0x62, 0x2b, 0x2e, 0x49, 0x2c, 0x29, 0x2d, 0x86, 0x5a, 0x02, 0xe5, 0x19, 0x59, 0x72, 0xb1,
+	0xbb, 0x17, 0xa5, 0xa6, 0x96, 0xa4, 0x16, 0x09, 0xe9, 0x71, 0x71, 0x87, 0x16, 0xa4, 0x24, 0x96,
+	0xa4, 0x82, 0x4d, 0x11, 0xe2, 0x85, 0x9b, 0x0a, 0x32, 0x49, 0x8a, 0x0f, 0xce, 0x05, 0x1b, 0xa8,
+	0xc4, 0xe0, 0xa4, 0xce, 0x25, 0x9a, 0x99, 0xaf, 0x97, 0x5e, 0x54, 0x90, 0xac, 0x57, 0x9e, 0x58,
+	0x52, 0x52, 0x01, 0x53, 0xe0, 0xc4, 0xe3, 0x04, 0x61, 0x04, 0x80, 0xbc, 0x1c, 0xc0, 0x98, 0xc4,
+	0x06, 0xf6, 0xbb, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x13, 0xf0, 0x7f, 0xb8, 0x0c, 0x01, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -240,8 +191,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GreeterClient interface {
-	// Sends a greeting
-	UpdateAsset(ctx context.Context, in *Conversion, opts ...grpc.CallOption) (*Reply, error)
+	UpdateAsset(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Reply, error)
 }
 
 type greeterClient struct {
@@ -252,7 +202,7 @@ func NewGreeterClient(cc *grpc.ClientConn) GreeterClient {
 	return &greeterClient{cc}
 }
 
-func (c *greeterClient) UpdateAsset(ctx context.Context, in *Conversion, opts ...grpc.CallOption) (*Reply, error) {
+func (c *greeterClient) UpdateAsset(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Reply, error) {
 	out := new(Reply)
 	err := c.cc.Invoke(ctx, "/backend.Greeter/UpdateAsset", in, out, opts...)
 	if err != nil {
@@ -263,15 +213,14 @@ func (c *greeterClient) UpdateAsset(ctx context.Context, in *Conversion, opts ..
 
 // GreeterServer is the server API for Greeter service.
 type GreeterServer interface {
-	// Sends a greeting
-	UpdateAsset(context.Context, *Conversion) (*Reply, error)
+	UpdateAsset(context.Context, *Data) (*Reply, error)
 }
 
 // UnimplementedGreeterServer can be embedded to have forward compatible implementations.
 type UnimplementedGreeterServer struct {
 }
 
-func (*UnimplementedGreeterServer) UpdateAsset(ctx context.Context, req *Conversion) (*Reply, error) {
+func (*UnimplementedGreeterServer) UpdateAsset(ctx context.Context, req *Data) (*Reply, error) {
 	return nil, errUnimplemented("UpdateAsset")
 }
 
@@ -280,7 +229,7 @@ func RegisterGreeterServer(s *grpc.Server, srv GreeterServer) {
 }
 
 func _Greeter_UpdateAsset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Conversion)
+	in := new(Data)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -292,7 +241,7 @@ func _Greeter_UpdateAsset_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/backend.Greeter/UpdateAsset",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GreeterServer).UpdateAsset(ctx, req.(*Conversion))
+		return srv.(GreeterServer).UpdateAsset(ctx, req.(*Data))
 	}
 	return interceptor(ctx, in, info, handler)
 }

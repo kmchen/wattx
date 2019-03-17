@@ -1,4 +1,4 @@
-package main
+package pricing
 
 import (
 	"context"
@@ -121,6 +121,7 @@ func main() {
 	assetValueDoneChan := make(chan Conversion)
 	go getAssetValue(topAssetsChan, assetValueDoneChan)
 	go getTopAssets(topAssetsChan)
+
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -131,8 +132,8 @@ func main() {
 
 	for value := range assetValueDoneChan {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		pbConversion := toProtoConversion(value)
-		r, err := c.UpdateAsset(ctx, &pbConversion)
+		pbData := toProtoConversion(value)
+		r, err := c.UpdateAsset(ctx, &pbData)
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
 		}
