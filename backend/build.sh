@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 export GOOS=linux
 export CGO_ENABLED=0
 
@@ -9,14 +10,13 @@ docker network create wattx-network
 docker stop rankingservice
 docker rm rankingservice
 # Build ranking service
-cd ranking;go build -o ranking-linux-amd64;echo built `pwd`;
+cd ranking;go get -d;go build -o ranking-linux-amd64;echo built `pwd`;
 docker build -t kmchen/rankingservice .
 docker create --name rankingservice -p=50051:50051 --network=wattx-network -p=8888:8888 kmchen/rankingservice:latest
 docker start rankingservice
 cd -
 
 rankingServiceIp=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rankingservice)
-
 
 # stop/remove pricingservice
 docker stop pricingservice

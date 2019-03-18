@@ -23,6 +23,7 @@ const (
 
 	assetUpdateTime = 60 * time.Second
 	batchSize       = 20
+	numTopAssets    = 200
 )
 
 var grpcServerIp = flag.String("serverIp", "localhost", "grpc server ip")
@@ -64,20 +65,21 @@ func httpGet(url string, headers map[string]string) ([]byte, error) {
 	return body, err
 }
 
-func getTopAssets(topAssetsChan chan []string) {
-	ticker := time.NewTicker(assetUpdateTime)
+func getTopAssets(topAssetsChan chan []string, ticker *time.Ticker, url string) {
 	t := time.Time{}
 	for ; true; t = <-ticker.C {
 		// Fetching top 500
-		fmt.Printf("Fetching top 200 assets %v\n", t)
-		resp, err := httpGet(topAssetsUrl, nil)
+		fmt.Printf("Fetching top 500 assets %v\n", t)
+		resp, err := httpGet(url, nil)
 		if err != nil {
 			fmt.Printf("Fail to fetch top asset: %v\n", err)
+			continue
 		}
 		// Unmarshal Asset data
 		crypto := model.Crypto{}
 		if err := json.Unmarshal(resp, &crypto); err != nil {
 			fmt.Printf("Fail to unmarshal assets: %v\n", err)
+			continue
 		}
 
 		// Sort by volume
@@ -86,11 +88,13 @@ func getTopAssets(topAssetsChan chan []string) {
 				return crypto.Data[j].Volume24hourto < crypto.Data[i].Volume24hourto
 			},
 		)
-		var topAssets = make([]string, 200)
+
+		// Make sure assets are whitelisted and select top 200
+		var topAssets = make([]string, 0, numTopAssets)
 		var j = 0
-		for i := 0; i < len(crypto.Data) && j < len(topAssets); i += 1 {
+		for i := 0; i < len(crypto.Data) && j < cap(topAssets); i += 1 {
 			if isWhiteListed(crypto.Data[i].Symbol) {
-				topAssets[j] = crypto.Data[i].Symbol
+				topAssets = append(topAssets, crypto.Data[i].Symbol)
 				j += 1
 			}
 		}
@@ -99,12 +103,12 @@ func getTopAssets(topAssetsChan chan []string) {
 	}
 }
 
-func getAssetValue(topAssetsChan chan []string, assetDoneChan chan model.Conversion) {
+func getAssetValue(topAssetsChan chan []string, assetDoneChan chan model.Conversion, currencyUrl string) {
 	for topAssets := range topAssetsChan {
 		for i := 0; i < len(topAssets); i += batchSize {
 			assets := topAssets[i : i+batchSize]
 			assetsStr := strings.Join(assets, ",")
-			fmt.Printf("url: %s\n", assetsStr, batchSize)
+			fmt.Printf("url: %s\n", assetsStr)
 			go func(symbols string, done chan model.Conversion) {
 				var url = fmt.Sprintf(currencyUrl, symbols)
 				var resp, err = httpGet(url, headers)
@@ -125,9 +129,12 @@ func getAssetValue(topAssetsChan chan []string, assetDoneChan chan model.Convers
 func main() {
 	flag.Parse()
 	topAssetsChan := make(chan []string)
+
 	assetValueDoneChan := make(chan model.Conversion)
-	go getAssetValue(topAssetsChan, assetValueDoneChan)
-	go getTopAssets(topAssetsChan)
+	go getAssetValue(topAssetsChan, assetValueDoneChan, currencyUrl)
+
+	topAssetTicker := time.NewTicker(assetUpdateTime)
+	go getTopAssets(topAssetsChan, topAssetTicker, topAssetsUrl)
 
 	// Set up a connection to the server.
 	var grpcAddr = fmt.Sprintf("%s:%s", *grpcServerIp, *grpcPort)
@@ -143,9 +150,10 @@ func main() {
 		pbData := model.ToProtoConversion(value)
 		r, err := c.UpdateAsset(ctx, &pbData)
 		if err != nil {
-			log.Fatalf("could not greet: %v", err)
+			fmt.Printf("Fail to send udpated asset to ranking service: %v", err)
+			continue
 		}
-		log.Printf("Greeting: %s", r.Status)
+		fmt.Printf("Successfully update asset to ranking service: %v", r.Status)
 		cancel()
 	}
 }
